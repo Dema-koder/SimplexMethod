@@ -135,19 +135,9 @@ void simplex_table() {
 				else
 					a[i].push_back(Frac(1));
 		}
-	//cout << "c\t";
 	c.push_back(Frac(0));
-	/*for (int i = 0; i < c.size(); i++)
-		c[i].print();
-	cout << endl;*/
 	for (int i = 0; i < b.size(); i++)
 		a[i].push_back(b[i]);
-	/*for (int i = 0; i < a.size(); i++) {
-		cout << i << '\t';
-		for (int j = 0; j < a[i].size(); j++)
-			a[i][j].print();
-		cout << endl;
-	}*/
 }
 
 void print_of_sim_table() {
@@ -194,11 +184,9 @@ void simplex_method() {
 		Frac lead_elem = a[neg_min][j];
 		for (int i = 0; i < a[j].size(); i++)
 			a[j][i] = a[j][i] / lead_elem;
-		// меняем z-row
 		Frac cur_elem = c[neg_min];
 		for (int i = 0; i < c.size(); i++)
 			c[i] = c[i] - cur_elem * a[j][i];
-		// меняем остальные ряды
 		for (int i = 0; i < a.size(); i++) {
 			if (i != j) {
 				cur_elem = a[i][neg_min];
