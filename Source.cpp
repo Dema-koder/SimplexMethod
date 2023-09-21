@@ -31,7 +31,7 @@ public:
 	Frac operator * (const Frac& frac) const {
 		ll x = numer * frac.numer, y = denum * frac.denum;
 		ll g = gcd(x, y);
-		return Frac(x/g, y/g);
+		return Frac(x / g, y / g);
 	}
 	Frac operator + (const Frac& frac) const {
 		ll x = 0, y = 0;
@@ -72,7 +72,7 @@ public:
 		return numer * frac.denum < frac.numer* denum;
 	}
 	bool operator > (const Frac& frac) const {
-		return numer * frac.denum > frac.numer* denum;
+		return numer * frac.denum > frac.numer * denum;
 	}
 	bool operator >= (const Frac& frac) const {
 		return numer * frac.denum >= frac.numer * denum;
@@ -104,6 +104,18 @@ vector<Frac>c;
 vector<int>inds;
 vector<Frac>ans;
 double apac;
+
+void print_of_sim_table() {
+	for (auto to : c)
+		to.print();
+	cout << endl;
+	cout << setiosflags(ios::left);
+	for (int i = 0; i < a.size(); i++) {
+		for (auto to : a[i])
+			to.print();
+		cout << endl;
+	}
+}
 
 void simplex_table() {
 	inds.resize(b.size());
@@ -138,18 +150,8 @@ void simplex_table() {
 	c.push_back(Frac(0));
 	for (int i = 0; i < b.size(); i++)
 		a[i].push_back(b[i]);
-}
-
-void print_of_sim_table() {
-	for (auto to : c)
-		to.print();
+	print_of_sim_table();
 	cout << endl;
-	cout << setiosflags(ios::left);
-	for (int i = 0; i < a.size(); i++) {
-		for (auto to : a[i])
-			to.print();
-		cout << endl;
-	}
 }
 
 void simplex_method() {
@@ -160,10 +162,10 @@ void simplex_method() {
 			if (c[neg_min] > c[i])
 				neg_min = i;
 		if (c[neg_min] >= Frac(0)) {
-			ans.resize(m);
-			for (auto to : inds)
-				if (to <= m)
-					ans[to] = a[to][a[to].size() - 1];
+			ans.resize(m, Frac(0));
+			for (int i = 0; i < inds.size(); i++)
+				if (inds[i] < m)
+					ans[inds[i]] = a[i][a[i].size() - 1]; ////
 			for (int i = 0; i < ans.size(); i++) {
 				cout << 'x' << i + 1 << " = ";
 				ans[i].print();
@@ -176,12 +178,16 @@ void simplex_method() {
 		Frac mn = Frac(1e9);
 		int j = 0;
 		for (int i = 0; i < a.size(); i++) {
-			Frac cur = a[i][c.size() - 1] / a[i][neg_min];
+			Frac cur = a[i][a[0].size() - 1] / a[i][neg_min];
 			if (cur > 0 && cur < mn)
 				mn = cur, j = i;
 		}
 		inds[j] = neg_min;
-		Frac lead_elem = a[neg_min][j];
+		//cout << neg_min << " " << j << endl;
+		//a[j][neg_min].print();
+		//cout << endl;
+		Frac lead_elem = a[j][neg_min]; 
+		//cout << endl;
 		for (int i = 0; i < a[j].size(); i++)
 			a[j][i] = a[j][i] / lead_elem;
 		Frac cur_elem = c[neg_min];
@@ -205,13 +211,15 @@ int main() {
 		string s = "", x = "";
 		if (j == -1) {
 			getline(cin, s);
+			s += ' ';
 			for (int i = 0; i < s.size(); i++) {
-				if (s[i] == ' ' || s[i] == '\n') {
+				if (s[i] == ' ') {
 					if (x != "")
-					c.push_back(Frac(stoll(x)));
+						c.push_back(Frac(stoll(x)));
 					x = "";
 				}
 				else
+					if ((s[i] >= '0' && s[i] <= '9') || s[i] == '-')
 					x += s[i];
 			}
 			m = c.size();
