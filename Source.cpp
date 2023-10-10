@@ -7,13 +7,18 @@ using namespace std;
 bool firstErr = false;
 typedef long long ll;
 
+// open input and output files
 fstream cin("input.txt");
 ofstream cout("output.txt");
 
+// greatest common divisor
 ll gcd(ll a, ll b) {
     return b ? gcd(b, a % b) : a;
 }
 
+// class of fractions
+// this class allow to get more humanly readable values
+// and we will not get error related to approximation
 class Frac {
 private:
     ll numer, denum;
@@ -24,11 +29,13 @@ public:
         ll g = gcd(x, y);
         numer = x / g, denum = y / g;
     }
+    // overloading the multiplication for fractions
     Frac operator * (const Frac& frac) const {
         ll x = numer * frac.numer, y = denum * frac.denum;
         ll g = gcd(x, y);
         return Frac(x / g, y / g);
     }
+    // overloading the addition for fractions
     Frac operator + (const Frac& frac) const {
         ll x = 0, y = 0;
         if (frac.denum == denum)
@@ -39,6 +46,7 @@ public:
         }
         return Frac(x, y);
     }
+    // overloading the subtraction for fractions
     Frac operator - (const Frac& frac) const {
         ll x = 0, y = 0;
         if (frac.denum == denum)
@@ -49,37 +57,44 @@ public:
         }
         return Frac(x, y);
     }
+    // overloading the division for fractions
     Frac operator / (const Frac& frac) const {
         ll x = numer * frac.denum;
         ll y = denum * frac.numer;
         return Frac(x, y);
     }
+    // overloading the boolean operator == for fraction
     bool operator == (const int x) const {
         if (numer / denum == x)
             return true;
         return false;
     }
+    // overloading the boolean operator != for fraction
     bool operator != (const int x) const {
         if (numer / denum != x)
             return true;
         return false;
     }
+    // overloading the boolean operator < for fraction
     bool operator < (const Frac& frac) const {
         return numer * frac.denum < frac.numer* denum;
     }
+    // overloading the boolean operator > for fraction
     bool operator > (const Frac& frac) const {
         return numer * frac.denum > frac.numer * denum;
     }
+    // overloading the boolean operator >= for fraction
     bool operator >= (const Frac& frac) const {
         return numer * frac.denum >= frac.numer * denum;
     }
+    // output the fraction om display
     void print() {
         cout << setiosflags(ios::left);
         if (numer < 0 && denum < 0)
             numer = abs(numer), denum = abs(denum);
         else
-        if (denum < 0)
-            numer = -numer, denum = abs(denum);
+            if (denum < 0)
+                numer = -numer, denum = abs(denum);
         if (denum == 1) {
             string ans = to_string(numer);
             cout << setw(6) << ans;
@@ -94,13 +109,19 @@ public:
 };
 
 int m;
+// matrix of constraints
 vector<vector<Frac>>a;
+// b vector
 vector<Frac>b;
+// c vector
 vector<Frac>c;
+// indexes of basics
 vector<int>inds;
+// vector of the answer
 vector<Frac>ans;
 double apac;
 
+// output the simplex table on the display
 void print_of_sim_table() {
     for (auto to : c)
         to.print();
@@ -113,6 +134,8 @@ void print_of_sim_table() {
     }
 }
 
+// build the simplex table before the start of thee algorithm
+// check and add basics if need 
 void simplex_table() {
     inds.resize(b.size());
     vector<bool>used(a.size(), false);
@@ -125,8 +148,8 @@ void simplex_table() {
             if (a[j][i] == 1 && k == -1)
                 k = j;
             else
-            if (a[j][i] == 1 && k != -1)
-                ok = false;
+                if (a[j][i] == 1 && k != -1)
+                    ok = false;
         }
         if (ok) {
             used[k] = true;
@@ -150,17 +173,21 @@ void simplex_table() {
     cout << endl;
 }
 
+// main part of the simplex algorithm
 void simplex_method() {
     while (true) {
         int neg_min = 0;
+        // find minimal negative element in c vector 
         for (int i = 0; i < c.size(); i++)
             if (c[neg_min] > c[i])
                 neg_min = i;
+        // if all element more that 0 than the simplex algorithm is done
+        // we output answer on the display
         if (c[neg_min] >= Frac(0)) {
             ans.resize(m, Frac(0));
             for (int i = 0; i < inds.size(); i++)
                 if (inds[i] < m)
-                    ans[inds[i]] = a[i][a[i].size() - 1]; ////
+                    ans[inds[i]] = a[i][a[i].size() - 1];
             for (int i = 0; i < ans.size(); i++) {
                 cout << 'x' << i + 1 << " = ";
                 ans[i].print();
@@ -170,6 +197,7 @@ void simplex_method() {
             c[c.size() - 1].print();
             break;
         }
+        // find the lead column
         Frac mn = Frac(1e9);
         int j = 0;
         bool neg = true;
@@ -180,8 +208,13 @@ void simplex_method() {
                 mn = cur, j = i;
             }
         }
-        if (neg){ cout << "The method is not applicable!";
-            break;}
+        // if all element elemnts of b vector divided by elements from lead column
+        // are negative then method is not applicable
+        if (neg) {
+            cout << "The method is not applicable!";
+            break;
+        }
+        // modification of all another parts of table
         else {
             inds[j] = neg_min;
             Frac lead_elem = a[j][neg_min];
@@ -205,6 +238,7 @@ void simplex_method() {
 
 int main() {
     int j = -1;
+    // read the input data and evoluate it in convinient to us form
     while (true) {
         string s, x;
         if (j == -1) {
@@ -217,8 +251,8 @@ int main() {
                     x = "";
                 }
                 else
-                if ((s[i] >= '0' && s[i] <= '9') || s[i] == '-')
-                    x += s[i];
+                    if ((s[i] >= '0' && s[i] <= '9') || s[i] == '-')
+                        x += s[i];
             }
             m = c.size();
         }
@@ -257,6 +291,8 @@ int main() {
         }
         j++;
     }
+    // firstErr - check the value of vector b
+    // if the vector b have negative values then the method is not applicable
     if (firstErr) cout << "The method is not applicable!";
     else {
         simplex_table();
